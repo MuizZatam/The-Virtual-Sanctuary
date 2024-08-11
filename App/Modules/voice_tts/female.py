@@ -6,14 +6,14 @@ from playsound import playsound
 
 
 # Defining the async function
-async def _generate_tts(text:str, output_file="tmp/output.mp3", voice="en-US-AriaNeural") -> None:
+async def _generate_tts(text:str, output_file="tmp/output.mp3", voice="en-US-AriaNeural"):
 
     communicate = edge_tts.Communicate(text, voice)
     await communicate.save(output_file)
 
 
 # Defining the tts_female function
-def tts_female(text, voice="en-US-AriaNeural") -> None:
+def tts_female(text: str, voice="en-US-AriaNeural") -> None:
 
     '''
         tts_female takes in a `str` input and provides 
