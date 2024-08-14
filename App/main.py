@@ -7,7 +7,12 @@ def main() -> None:
     tts("""
 
         Welcome to the Virtual Sanctuary!
-        
+
         I am Ryan!
         The Narrator of The Virtual Sanctuary!
     """)
+
+
+if __name__ == "__main__":
+
+    main()
