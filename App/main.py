@@ -1,14 +1,13 @@
 # Defining Imports
-from Modules.voice_tts import male, female
+from Modules.voice_tts.tts import tts
 
 
-# Main function
 def main() -> None:
 
-    male.tts_male("Hello World! I am Ryan!")
-    female.tts_female("Hello World! I am Aria!")
+    tts("""
 
-
-if __name__ == "__main__":
-
-    main()
+        Welcome to the Virtual Sanctuary!
+        
+        I am Ryan!
+        The Narrator of The Virtual Sanctuary!
+    """)
