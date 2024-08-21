@@ -6,21 +6,21 @@ from playsound import playsound
 
 
 # Defining the async function
-async def _generate_tts(text:str, output_file="tmp/output.mp3", voice="en-US-AriaNeural"):
+async def _generate_tts(text, output_file="tmp/male_output.mp3", voice="en-US-AriaNeural"):
 
     communicate = edge_tts.Communicate(text, voice)
     await communicate.save(output_file)
 
 
-# Defining the tts_female function
-def tts_female(text: str, voice="en-US-AriaNeural") -> None:
+# Defining the tts_male function
+def tts(text: str, voice="en-GB-RyanNeural") -> None:
 
     '''
-        tts_female takes in a `str` input and provides 
+        tts_male takes in a `str` input and provides 
         a tts output using the `edge_tts` module
     '''
 
-    output_file = "tmp/output.mp3"
+    output_file = "tmp/male_output.mp3"
     
     # Check if there's an existing event loop
     try:
@@ -37,6 +37,7 @@ def tts_female(text: str, voice="en-US-AriaNeural") -> None:
     os.remove(output_file)
 
 
+# Example usage
 if __name__ == "__main__":
 
-    tts_female("Hello, this is a test of the text-to-speech functionality.")
+    tts("Hello, this is a test of the text-to-speech functionality.")

@@ -1,12 +1,13 @@
 # Defining Imports
-from Modules.voice_tts import male, female
+from Modules.tts import tts
+from Modules.eco_translate import to_species
+from Modules.bing_images import fetch_bing_images
+from Modules.geocode import geocode
 
 
-# Main function
 def main() -> None:
 
-    male.tts_male("Hello World! I am Ryan!")
-    female.tts_female("Hello World! I am Aria!")
+    ...
 
 
 if __name__ == "__main__":
