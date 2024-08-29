@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 edge-tts = "*"
 playsound = "*"
-econametranslator = "*"
 geopy = "*"
 
 [dev-packages]
