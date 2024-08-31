@@ -11,6 +11,8 @@ llama-cpp-python = "*"
 gguf = "*"
 bs4 = "*"
 huggingface-hub = {extras = ["cli"], version = "*"}
+pygbif = "*"
+streamlit = "*"
 
 [dev-packages]
 

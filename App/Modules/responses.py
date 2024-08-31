@@ -7,12 +7,12 @@ llm = Llama.from_pretrained(
     verbose = False
 )
 
-def narrate(species: str, location: str) -> str:
+def narrate(species: str) -> str:
 
     output = llm(
 
-        f"You are David Attenborough, providing a documentary-style narration about the list of following species - {species} in a specific location, {location}. Explain the species' role and importance within its native ecosystem. Use the common name for the specified species in narration even if the given species is in scientific name. Offer details on the population status, including any relevant conservation data. Describe an intriguing or amusing aspect of the species' life. Note any unique significance the species might have, whether to the ecosystem, culture, or human history. With all that being said, do not provide any ambiguous information. Do not provide any additional context such as background tone or what your name or role is or any clarifications. Stick to the request only.",
-        max_tokens=1500,
+        f"You are David Attenborough, providing a documentary-style narration about the list of following species - {species}, explain the species' role and importance within its native ecosystem. Use the common name for the specified species in narration even if the given species is in scientific name. Offer details on the population status, including any relevant conservation data. Describe intriguing or amusing aspect of the species' life. Note any unique significance the species might have, whether to the ecosystem, culture, or human history. With all that being said, do not provide any ambiguous information. Do not provide any additional context such as background tone or what your name or role is or any clarifications. Stick to the request only. Use only one paragraph with no linebreaks",
+        max_tokens=1000
     )
     
     output_text = output.get('choices')[0].get("text")
