@@ -7,6 +7,10 @@ name = "pypi"
 edge-tts = "*"
 playsound = "*"
 geopy = "*"
+llama-cpp-python = "*"
+gguf = "*"
+bs4 = "*"
+huggingface-hub = {extras = ["cli"], version = "*"}
 
 [dev-packages]
 
