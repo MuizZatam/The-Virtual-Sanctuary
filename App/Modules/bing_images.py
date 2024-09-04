@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def fetch_bing_images(query, num=10) -> list[str]:
+def fetch_bing_images(query, num=5) -> list[str]:
 
     """
     Fetches a specified number of image URLs from Bing Image Search, 

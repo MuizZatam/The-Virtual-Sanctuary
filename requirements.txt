@@ -1,4 +1,0 @@
-edge-tts
-playsound
-EcoNameTranslator
-geopy
