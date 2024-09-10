@@ -10,9 +10,12 @@ geopy = "*"
 llama-cpp-python = "*"
 gguf = "*"
 bs4 = "*"
-huggingface-hub = {extras = ["cli"], version = "*"}
 pygbif = "*"
 streamlit = "*"
+google-generativeai = "*"
+python-dotenv = "*"
+pydub = "*"
+flask = "*"
 
 [dev-packages]
 

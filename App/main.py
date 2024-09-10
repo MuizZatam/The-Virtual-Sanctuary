@@ -1,33 +1,33 @@
-# Defining Imports
+from flask import Flask, render_template, request
 from Modules.bing_images import fetch_bing_images
-from Modules.responses import narrate
 from Modules.api import API_response
-import streamlit as st
+from Modules.gemini import narrate
 
+app = Flask(__name__)
 
-def main() -> None:
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        location = request.form.get("location")
+        if location:
+            species = API_response(location)
+            narrations = narrate(species, location).split("\n--\n")
+            species_data = []
+            for specie in species:
+                images_list = fetch_bing_images(specie)  # Fetch multiple images
+                
+                try:
+                    narration = narrations.pop(0)
+                    species_data.append((images_list, narration))
 
-    st.set_page_config(layout="wide")
-    st.title("The Virtual Sanctuary")
+                except IndexError:
 
-    location = st.text_input("Enter a location: ")
-
-    if location:
-
-        species = API_response(location)
-
-        for specie in species:
-
-            images_list = fetch_bing_images(specie)
-            narration = narrate(specie)
-
-            st.image(images_list, width = 400)
-
-            st.markdown(narration)
-
-            st.html("</br></br></br>")
-
+                    pass
+            
+            return render_template("index.html", species_data=species_data)
+        else:
+            return render_template("index.html", error="Unfortunately, we don't have that address documented :(")
+    return render_template("index.html")
 
 if __name__ == "__main__":
-
-    main()
+    app.run(debug=True)

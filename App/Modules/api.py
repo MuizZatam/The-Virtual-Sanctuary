@@ -4,9 +4,9 @@ from geopy.geocoders import Nominatim
 from math import cos, radians
 
 
-def geocode(address: str, length: int = 1) -> list | str:
+def geocode(address: str, length: int = 50) -> list | str:
 
-    geolocator = Nominatim(user_agent="narrate-life")
+    geolocator = Nominatim(user_agent="The-Virtual-Sanctuary")
     location = geolocator.geocode(address)
 
     if location:
@@ -27,7 +27,7 @@ def geocode(address: str, length: int = 1) -> list | str:
         return "Address not documented"
 
 
-def select(species: list, n: int = 10) -> list:
+def select(species: list, n: int = 15) -> list:
 
     selected = list()
 
@@ -45,9 +45,10 @@ def API_response(address: str) -> list | str:
 
     geo_data = geocode(address)
     if isinstance(geo_data, str):
-        return geo_data
+        return None
 
-    min_lat, max_lat, min_lon, max_lon = geo_data
+    else:
+        min_lat, max_lat, min_lon, max_lon = geo_data
 
     gbif_url = "https://api.gbif.org/v1/occurrence/search"
 
@@ -57,7 +58,7 @@ def API_response(address: str) -> list | str:
         'decimalLongitude': f'{min_lon},{max_lon}',
         'hasCoordinate': 'true',
         'hasGeospatialIssue': 'false',
-        'limit': 10000
+        'limit': 40000
     }
 
     response = requests.get(gbif_url, params=params)

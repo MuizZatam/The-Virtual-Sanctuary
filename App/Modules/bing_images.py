@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def fetch_bing_images(query, num=5) -> list[str]:
+def fetch_bing_images(query, num=4) -> list[str]:
 
     """
     Fetches a specified number of image URLs from Bing Image Search, 
@@ -43,7 +43,6 @@ def fetch_bing_images(query, num=5) -> list[str]:
     soup = BeautifulSoup(response.text, 'html.parser')
     
     image_urls = list()
-    wiki_commons_urls = list()
 
     for img_tag in soup.find_all("a", {"class": "iusc"}):
 
@@ -53,21 +52,15 @@ def fetch_bing_images(query, num=5) -> list[str]:
 
             img_link = m.split('"murl":"')[1].split('","')[0]
 
-            if "wikimedia.org" in img_link:
-
-                wiki_commons_urls.append(img_link)
-
-            else:
-
-                image_urls.append(img_link)
+            image_urls.append(img_link)
         
         
-        if len(wiki_commons_urls) + len(image_urls) >= num:
+        if len(image_urls) >= num:
 
             break
     
     
-    return wiki_commons_urls + image_urls[:num - len(wiki_commons_urls)]
+    return image_urls
     
 
 def main():
