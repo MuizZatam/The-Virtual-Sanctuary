@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from Modules.bing_images import fetch_bing_images
 from Modules.api import API_response
 from Modules.gemini import narrate
 
@@ -9,24 +8,35 @@ app = Flask(__name__)
 def index():
     if request.method == "POST":
         location = request.form.get("location")
-        if location:
+        
+        if not location:
+            return render_template("index.html", error="Unfortunately, we don't have that location documented :(")
+        
+        try:
+
             species = API_response(location)
-            narrations = narrate(species, location).split("\n--\n")
-            species_data = []
-            for specie in species:
-                images_list = fetch_bing_images(specie)  # Fetch multiple images
-                
-                try:
-                    narration = narrations.pop(0)
-                    species_data.append((images_list, narration))
+            specie_list = list()
+            narrations = list()
+            for key in species.keys():
 
-                except IndexError:
-
-                    pass
+                specie_list.append(key)
             
+            narrations = narrate(specie_list, location).split('--')
+
+            species_data = dict()
+            for index, specie in enumerate(specie_list):
+                
+                species_data[specie] = {
+                    "narration": narrations[index],
+                    "images": species[specie]
+                }
+
             return render_template("index.html", species_data=species_data)
-        else:
-            return render_template("index.html", error="Unfortunately, we don't have that address documented :(")
+        
+        except Exception as e:
+            # Add general error handling
+            return render_template("index.html", error=f"An error occurred: {str(e)}")
+    
     return render_template("index.html")
 
 if __name__ == "__main__":

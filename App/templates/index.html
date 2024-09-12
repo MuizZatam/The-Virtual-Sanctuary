@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Virtual Sanctuary</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
 </head>
+
 <body>
     <div class="container">
         <h1>The Virtual Sanctuary</h1>
+
         <form method="POST">
-            <input type="text" name="location" placeholder="Enter a location" required>
+            <input type="text" name="location" placeholder="Enter a location">
             <button type="submit">Search</button>
         </form>
-        
+
         {% if species_data %}
-            <div class="species-results">
-                {% for images, narration in species_data %}
-                    <div class="species-block">
-                        <div class="species-images">
-                            <!-- Loop through the list of images for each species -->
-                            {% for image in images %}
-                                <img src="{{ image }}" width="300" style="margin: 10px;">
-                            {% endfor %}
-                        </div>
-                        <div class="species-narration">
-                            <p>{{ narration }}</p>
-                        </div>
-                    </div>
-                    <hr>
-                {% endfor %}
+        <div class="species-results">
+            {% for species, details in species_data.items() %}
+            <div class="species-block">
+                <div class="species-images">
+                    {% for image in details.images %}
+                    <img src="{{ image }}" alt="{{ species }} image">
+                    {% endfor %}
+                </div>
+                <div class="species-narration">
+                    <p>{{ details.narration }}</p>
+                </div>
             </div>
+            {% endfor %}
+        </div>
         {% elif error %}
-            <p>{{ error }}</p>
+        <p class="error">{{ error }}</p>
         {% endif %}
     </div>
 </body>
+
 </html>

@@ -1,24 +1,101 @@
 body {
     font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
-    width: 80%;
+    width: 90%;
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
     text-align: center;
+    color: #2c3e50;
+}
+
+form {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    width: 60%;
+    max-width: 300px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.species-results {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 
 .species-block {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.species-images {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: #ecf0f1;
 }
 
 .species-images img {
     max-width: 100%;
+    height: auto;
+    margin: 5px;
+    border-radius: 4px;
 }
 
 .species-narration {
-    width: 50%;
-    text-align: left;
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.species-narration h2 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.error {
+    color: #e74c3c;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .species-block {
+        flex-direction: column;
+    }
+
+    .species-images, .species-narration {
+        width: 100%;
+    }
 }

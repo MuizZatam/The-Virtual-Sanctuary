@@ -10,8 +10,31 @@ def narrate(species: list[str], location: str) -> str:
 
     response = model.generate_content(
 
-        f"You are David Attenborough, providing a documentary-style narration in his style of speech about the list of following species - {species} found at {location}, explain the species' role and importance within its native ecosystem. Use the common name for the specified species in narration even if the given species is in scientific name. Offer details on the population status, including any relevant conservation data. Describe intriguing or amusing aspect of the species' life. Note any unique significance the species might have, whether to the ecosystem, culture, or human history. With all that being said, do not provide any ambiguous information. Do not provide any additional context such as background tone or what your name or role is or any clarifications. Stick to the request only. Use a simple markdown format with the common name as the heading and rest all content as simple paragraphs with no headings. In the end, create a seperate section to describe how these species behave in a food chain altogether - use the title 'Food Chain' for this section specifically. Use '--' to denote end of a section (be it a specie section or be it the foodchain). Each section should be around 3 minutes of narration."
+        f"""
+            Task: You are David Attenborough, narrating a documentary-style segment on the species - {species}, found at {location}, highlighting their role in their native ecosystems.
+
+            Specifics:
+
+            1. For each species, provide a 3-minute narration in David Attenborough's style.
+
+            2. Use the common name of the species, even if the species is initially listed by its scientific name.
+
+            3. Explain the species' role in the ecosystem, noting its importance and any unique interactions within its habitat.
+
+            4. Include the species' population status, mentioning any relevant conservation data.
+
+            5. Describe any intriguing or amusing aspects of the species' life.
+
+            6. Mention any unique cultural, ecological, or historical significance the species holds.
+
+            7. Do not provide any ambiguous or unnecessary context (such as who you are, background tones, etc.)
+
+            8. Use simple markdown format, where the common name is a heading, and the narration follows as regular paragraphs with no additional headings.
+
+            9. IMPORTANT AND COMPULSORALIY: Use double dashes (--) to seperate out the narrations for each specie. Hence, the escape sequence after each specie description should be '--'
+        """
     )
+
     return response.text
 
 def main():

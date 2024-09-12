@@ -16,6 +16,8 @@ google-generativeai = "*"
 python-dotenv = "*"
 pydub = "*"
 flask = "*"
+markdown = "*"
+wikipedia-api = "*"
 
 [dev-packages]
 
