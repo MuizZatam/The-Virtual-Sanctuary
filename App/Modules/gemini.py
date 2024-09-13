@@ -6,7 +6,7 @@ load_dotenv()
 genai.configure(api_key=environ["API"])
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
-def narrate(species: list[str], location: str) -> str:
+def narrate(species: str, location: str) -> str:
 
     response = model.generate_content(
 
@@ -31,7 +31,6 @@ def narrate(species: list[str], location: str) -> str:
 
             8. Use simple markdown format, where the common name is a heading, and the narration follows as regular paragraphs with no additional headings.
 
-            9. IMPORTANT AND COMPULSORALIY: Use double dashes (--) to seperate out the narrations for each specie. Hence, the escape sequence after each specie description should be '--'
         """
     )
 
