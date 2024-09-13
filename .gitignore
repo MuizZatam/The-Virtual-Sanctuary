@@ -163,3 +163,4 @@ cython_debug/
 
 # Ignore local tests
 tests/
+node_modules/

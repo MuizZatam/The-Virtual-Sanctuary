@@ -4,7 +4,7 @@ from geopy.geocoders import Nominatim
 from math import cos, radians
 
 
-def geocode(address: str, length: int = 30) -> list | str:
+def geocode(address: str, length: int = 50) -> list | str:
     geolocator = Nominatim(user_agent="The-Virtual-Sanctuary")
     location = geolocator.geocode(address)
 

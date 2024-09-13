@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, jsonify
 from Modules.api import API_response
 from Modules.gemini import narrate
 from Modules.coords import coords
@@ -14,7 +14,7 @@ def index():
         
         if not location:
 
-            return render_template("index.html", error="Unfortunately, we don't have that location documented :(")
+            return jsonify({"undocumented-location": "Unfortunately, we don't have that location documented :("})
         
         try:
 
@@ -28,24 +28,24 @@ def index():
 
                 specie_list.append(key)
             
-                narrations.append(narrate(key, location))
+            narrations = narrate(specie_list, location).split('sep')
 
             species_data = dict()
             for index, specie in enumerate(specie_list):
                 
                 species_data[specie] = {
+
                     "narration": narrations[index],
                     "images": species[specie],
                     "coords": map_plots
                 }
 
-            return render_template("index.html", species_data=species_data)
+            return  jsonify({'species_data': species_data})
         
         except Exception as e:
             # Add general error handling
-            return render_template("index.html", error=f"An error occurred: {str(e)}")
+            return jsonify({'error':'An error occurred: str(e)'})
     
-    return render_template("index.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

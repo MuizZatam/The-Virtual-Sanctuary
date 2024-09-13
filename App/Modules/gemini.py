@@ -31,6 +31,7 @@ def narrate(species: str, location: str) -> str:
 
             8. Use simple markdown format, where the common name is a heading, and the narration follows as regular paragraphs with no additional headings.
 
+            9. Use the seperator 'sep' to seperate out narrations for each specie in the list
         """
     )
 
