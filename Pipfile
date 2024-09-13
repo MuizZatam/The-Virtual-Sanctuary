@@ -18,6 +18,7 @@ pydub = "*"
 flask = "*"
 markdown = "*"
 wikipedia-api = "*"
+flask-cors = "*"
 
 [dev-packages]
 

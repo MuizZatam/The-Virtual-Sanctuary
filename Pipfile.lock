@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "06df97572ff85e87713f50c02c8394e333f818007178179668e668a77d51c136"
+            "sha256": "ec72c363eead17efa9b12dafe1c6d9906c0457294348e748e63de97f177ab2b6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -433,6 +433,14 @@
             "markers": "python_version >= '3.8'",
             "version": "==3.0.3"
         },
+        "flask-cors": {
+            "hashes": [
+                "sha256:5aadb4b950c4e93745034594d9f3ea6591f734bb3662e16e255ffbf5e89c88ef",
+                "sha256:b9e307d082a9261c100d8fb0ba909eec6a228ed1b60a8315fd85f783d61910bc"
+            ],
+            "index": "pypi",
+            "version": "==5.0.0"
+        },
         "fonttools": {
             "hashes": [
                 "sha256:02569e9a810f9d11f4ae82c391ebc6fb5730d95a0657d24d754ed7763fb2d122",
@@ -666,11 +674,11 @@
         },
         "google-generativeai": {
             "hashes": [
-                "sha256:d7a76f72a2736f5c0960be836c5e864aea32b08105b51cab81835522eb62938b"
+                "sha256:b031877f24d51af0945207657c085896a0a886eceec7a1cb7029327b0aa6e2f6"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.9'",
-            "version": "==0.8.0"
+            "version": "==0.8.1"
         },
         "googleapis-common-protos": {
             "hashes": [

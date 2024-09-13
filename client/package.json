@@ -1,6 +1,7 @@
 {
   "name": "client",
   "private": true,
+  "proxy": "localhost:5000/index",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
