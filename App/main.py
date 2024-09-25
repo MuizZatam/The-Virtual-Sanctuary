@@ -1,33 +1,46 @@
-# Defining Imports
-from Modules.bing_images import fetch_bing_images
-from Modules.responses import narrate
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from Modules.api import API_response
-import streamlit as st
+from Modules.gemini import narrate
+from Modules.coords import coords
+from Modules.audio import get_inaturalist_audio
 
+app = Flask(__name__)
+CORS(app)
 
-def main() -> None:
+@app.route("/", methods=["GET", "POST"])
+@app.route("/index", methods=["GET", "POST"])  
+def index():
+    if request.method == "POST":
+        location = request.json.get('location')
+        
+        if not location:
+            return jsonify({"undocumented-location": "Unfortunately, we don't have that location documented :("})
+        
+        try:
+            map_plots = coords(location)
+            species = API_response(location)
 
-    st.set_page_config(layout="wide")
-    st.title("The Virtual Sanctuary")
+            specie_list = list(species.keys())
+            narrations = narrate(specie_list, location)  # Get narrations as a list
 
-    location = st.text_input("Enter a location: ")
+            species_data = {
+                specie: {
+                    "narration": narrations[index],  # Map each narration to the corresponding species
+                    "images": species[specie],
+                    "coords": map_plots,
+                    "audio": get_inaturalist_audio(specie)
+                } for index, specie in enumerate(specie_list)
+            }
 
-    if location:
+            return jsonify(species_data)
+        
+        except Exception as e:
+            return jsonify({'error': f'An error occurred: {str(e)}'})
+    
+    else:
+        return ""
 
-        species = API_response(location)
-
-        for specie in species:
-
-            images_list = fetch_bing_images(specie)
-            narration = narrate(specie)
-
-            st.image(images_list, width = 400)
-
-            st.markdown(narration)
-
-            st.html("</br></br></br>")
-
-
+    
 if __name__ == "__main__":
-
-    main()
+    app.run(debug=True)

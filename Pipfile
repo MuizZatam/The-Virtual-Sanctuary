@@ -7,12 +7,18 @@ name = "pypi"
 edge-tts = "*"
 playsound = "*"
 geopy = "*"
-llama-cpp-python = "*"
 gguf = "*"
 bs4 = "*"
-huggingface-hub = {extras = ["cli"], version = "*"}
 pygbif = "*"
 streamlit = "*"
+google-generativeai = "*"
+python-dotenv = "*"
+pydub = "*"
+flask = "*"
+markdown = "*"
+wikipedia-api = "*"
+flask-cors = "*"
+pandas = "*"
 
 [dev-packages]
 

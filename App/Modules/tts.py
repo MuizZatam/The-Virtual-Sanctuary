@@ -6,7 +6,7 @@ from playsound import playsound
 
 
 # Defining the async function
-async def _generate_tts(text, output_file="tmp/male_output.mp3", voice="en-US-AriaNeural"):
+async def _generate_tts(text, output_file="tmp/output.mp3", voice="en-GB-RyanNeural"):
 
     communicate = edge_tts.Communicate(text, voice)
     await communicate.save(output_file)
@@ -20,7 +20,7 @@ def tts(text: str, voice="en-GB-RyanNeural") -> None:
         a tts output using the `edge_tts` module
     '''
 
-    output_file = "tmp/male_output.mp3"
+    output_file = "tmp/output.mp3"
     
     # Check if there's an existing event loop
     try:
