@@ -7,7 +7,6 @@ name = "pypi"
 edge-tts = "*"
 playsound = "*"
 geopy = "*"
-llama-cpp-python = "*"
 gguf = "*"
 bs4 = "*"
 pygbif = "*"
@@ -19,6 +18,7 @@ flask = "*"
 markdown = "*"
 wikipedia-api = "*"
 flask-cors = "*"
+pandas = "*"
 
 [dev-packages]
 

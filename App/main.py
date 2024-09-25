@@ -3,6 +3,7 @@ from flask_cors import CORS
 from Modules.api import API_response
 from Modules.gemini import narrate
 from Modules.coords import coords
+from Modules.audio import get_inaturalist_audio
 
 app = Flask(__name__)
 CORS(app)
@@ -21,13 +22,14 @@ def index():
             species = API_response(location)
 
             specie_list = list(species.keys())
-            narrations = narrate(specie_list, location).split('sep')
+            narrations = narrate(specie_list, location)  # Get narrations as a list
 
             species_data = {
                 specie: {
-                    "narration": narrations[index],
+                    "narration": narrations[index],  # Map each narration to the corresponding species
                     "images": species[specie],
-                    "coords": map_plots
+                    "coords": map_plots,
+                    "audio": get_inaturalist_audio(specie)
                 } for index, specie in enumerate(specie_list)
             }
 
@@ -38,6 +40,7 @@ def index():
     
     else:
         return ""
+
     
 if __name__ == "__main__":
     app.run(debug=True)
