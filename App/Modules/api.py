@@ -1,10 +1,12 @@
 import requests
-import random
+from bs4 import BeautifulSoup
+import re
+from functools import lru_cache
 from geopy.geocoders import Nominatim
 from math import cos, radians
 
-
-def geocode(address: str, length: int = 50) -> list | str:
+@lru_cache(maxsize=128)
+def geocode(address: str, length: int = 50) -> tuple:
     geolocator = Nominatim(user_agent="The-Virtual-Sanctuary")
     location = geolocator.geocode(address)
 
@@ -17,80 +19,117 @@ def geocode(address: str, length: int = 50) -> list | str:
         min_lon = longitude - radius_deg / cos(radians(latitude))
         max_lon = longitude + radius_deg / cos(radians(latitude))
 
-        return [min_lat, max_lat, min_lon, max_lon]
+        return ([min_lat, max_lat, min_lon, max_lon], [longitude, latitude])
     
-    else:
-        return "Address not documented"
+    return None
 
+@lru_cache(maxsize=128)
+def fetch_species_data(species):
+    data = {
+        "wikipedia": "No Wikipedia summary found",
+        "inaturalist": "No iNaturalist data found",
+        "audio": None
+    }
 
-def select(species_with_media: list, n: int = 10) -> list:
-    """
-    Select `n` species randomly from the list, ensuring they have media associated.
-    """
-    if len(species_with_media) <= n:
-        return species_with_media  # If less than or equal to `n` species with media, return all
+    # Fetch Wikipedia summary
+    wiki_url = f"https://en.wikipedia.org/wiki/{species.replace(' ', '_')}"
+    wiki_response = requests.get(wiki_url)
+    if wiki_response.status_code == 200:
+        soup = BeautifulSoup(wiki_response.content, 'html.parser')
+        paragraphs = soup.find_all('p')
+        for p in paragraphs:
+            if p.find('b'):
+                summary = re.sub(r'\[\d+\]', '', p.text)
+                sentences = summary.split('. ')[:3]
+                data["wikipedia"] = '. '.join(sentences) + '.'
+                break
 
-    return random.sample(species_with_media, n)  # Randomly select `n` species with media
+    # Fetch iNaturalist data and audio
+    inaturalist_url = f"https://api.inaturalist.org/v1/taxa?q={species}"
+    inat_response = requests.get(inaturalist_url)
+    if inat_response.status_code == 200:
+        inat_data = inat_response.json()
+        if inat_data['results']:
+            result = inat_data['results'][0]
+            data["inaturalist"] = {
+                'name': result.get('preferred_common_name', species),
+                'scientific_name': result.get('name', 'N/A'),
+                'observations_count': result.get('observations_count', 'N/A'),
+                'conservation_status': result.get('conservation_status', {}).get('status', 'N/A'),
+                'wikipedia_url': result.get('wikipedia_url', 'N/A')
+            }
+            sounds = result.get('sounds', [])
+            if sounds:
+                data["audio"] = sounds[0].get('file_url')
 
+    return data
 
-def API_response(address: str, n: int = 15) -> dict:
-    """
-    Retrieves species data based on the geolocation and returns a dictionary 
-    where keys are species names and values are lists of media URLs.
-    """
+def API_Response(address: str, n: int = 8) -> dict:
     geo_data = geocode(address)
-    if isinstance(geo_data, str):
-        return None
-    else:
-        min_lat, max_lat, min_lon, max_lon = geo_data
+    if not geo_data:
+        return {"error": "Address not documented"}
+
+    (min_lat, max_lat, min_lon, max_lon), map_plots = geo_data
 
     gbif_url = "https://api.gbif.org/v1/occurrence/search"
-
     params = {
         'decimalLatitude': f'{min_lat},{max_lat}',
         'decimalLongitude': f'{min_lon},{max_lon}',
         'hasCoordinate': 'true',
         'hasGeospatialIssue': 'false',
-        'limit': 100  # Increase limit to get more results for species
+        'limit': 300,
+        'mediaType': 'StillImage'
     }
 
     response = requests.get(gbif_url, params=params)
     results = response.json()
 
-    excluded_groups = [
+    excluded_groups = {
         'Fungi', 'Bacteria', 'Protista', 'Insecta', 'Arachnida', 'Mollusca', 
         'Annelida', 'Nematoda', 'Platyhelminthes', 'Plankton', 'Cestoda', 
         'Trematoda', 'Gastropoda', 'Bivalvia'
-    ]
+    }
 
-    species_media_dict = {}
+    species_data = {}
 
     for result in results.get('results', []):
         taxon_class = result.get('class')
         if 'species' in result and taxon_class not in excluded_groups:
             species_name = result['species']
-
-            # Fetch media data if available
             media = result.get('media', [])
             media_urls = [m['identifier'] for m in media if 'identifier' in m]
 
-            if media_urls:  # Only add species if it has associated media
-                species_media_dict[species_name] = media_urls
+            if media_urls and species_name not in species_data:
+                additional_data = fetch_species_data(species_name)
+                species_data[species_name] = {
+                    "images": media_urls,
+                    "wikipedia": additional_data["wikipedia"],
+                    "inaturalist": additional_data["inaturalist"],
+                    "audio": additional_data["audio"]
+                }
 
-    return species_media_dict
+            if len(species_data) == n:
+                break
 
-
+    return {
+        "species_data": species_data,
+        "coords": map_plots
+    }
 
 def main():
     address = input("Enter the address: ")
-    species_with_media = API_response(address)
+    result = API_Response(address)
     
-    if species_with_media:
-        
-        print(species_with_media)
+    if "error" in result:
+        print(result["error"])
     else:
-        print("No species with media found or address not documented.")
-
+        print(f"Coordinates: {result['coords']}")
+        for species, data in result['species_data'].items():
+            print(f"\n{species}:")
+            print(f"Wikipedia summary: {data['wikipedia']}")
+            print(f"iNaturalist data: {data['inaturalist']}")
+            print(f"Images: {data['images']}")
+            print(f"Audio available: {'Yes' if data['audio'] else 'No'}")
 
 if __name__ == "__main__":
     main()
