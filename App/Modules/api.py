@@ -28,13 +28,14 @@ def fetch_species_data(species):
     data = {
         "wikipedia": "No Wikipedia summary found",
         "inaturalist": "No iNaturalist data found",
-        "audio": None
+        "audio": []
     }
 
     # Fetch Wikipedia summary
     wiki_url = f"https://en.wikipedia.org/wiki/{species.replace(' ', '_')}"
-    wiki_response = requests.get(wiki_url)
-    if wiki_response.status_code == 200:
+    try:
+        wiki_response = requests.get(wiki_url)
+        wiki_response.raise_for_status()
         soup = BeautifulSoup(wiki_response.content, 'html.parser')
         paragraphs = soup.find_all('p')
         for p in paragraphs:
@@ -43,11 +44,14 @@ def fetch_species_data(species):
                 sentences = summary.split('. ')[:3]
                 data["wikipedia"] = '. '.join(sentences) + '.'
                 break
+    except requests.RequestException as e:
+        print(f"Error fetching Wikipedia data: {e}")
 
-    # Fetch iNaturalist data and audio
+    # Fetch iNaturalist data
     inaturalist_url = f"https://api.inaturalist.org/v1/taxa?q={species}"
-    inat_response = requests.get(inaturalist_url)
-    if inat_response.status_code == 200:
+    try:
+        inat_response = requests.get(inaturalist_url)
+        inat_response.raise_for_status()
         inat_data = inat_response.json()
         if inat_data['results']:
             result = inat_data['results'][0]
@@ -58,9 +62,28 @@ def fetch_species_data(species):
                 'conservation_status': result.get('conservation_status', {}).get('status', 'N/A'),
                 'wikipedia_url': result.get('wikipedia_url', 'N/A')
             }
-            sounds = result.get('sounds', [])
-            if sounds:
-                data["audio"] = sounds[0].get('file_url')
+    except requests.RequestException as e:
+        print(f"Error fetching iNaturalist data: {e}")
+
+    # Fetch audio from Xeno-canto (for birds)
+    xeno_canto_url = f"https://www.xeno-canto.org/api/2/recordings?query={species}"
+    try:
+        xc_response = requests.get(xeno_canto_url)
+        xc_response.raise_for_status()
+        xc_data = xc_response.json()
+        recordings = xc_data.get('recordings', [])
+        for recording in recordings[:2]:  # Limit to 2 recordings
+            audio_data = {
+                'source': 'Xeno-canto',
+                'id': recording.get('id'),
+                'url': recording.get('file'),
+                'recordist': recording.get('rec'),
+                'country': recording.get('cnt'),
+                'quality': recording.get('q')
+            }
+            data["audio"].append(audio_data)
+    except requests.RequestException as e:
+        print(f"Error fetching Xeno-canto data: {e}")
 
     return data
 
@@ -81,8 +104,12 @@ def API_Response(address: str, n: int = 8) -> dict:
         'mediaType': 'StillImage'
     }
 
-    response = requests.get(gbif_url, params=params)
-    results = response.json()
+    try:
+        response = requests.get(gbif_url, params=params)
+        response.raise_for_status()
+        results = response.json()
+    except requests.RequestException as e:
+        return {"error": f"Error fetching GBIF data: {e}"}
 
     excluded_groups = {
         'Fungi', 'Bacteria', 'Protista', 'Insecta', 'Arachnida', 'Mollusca', 
@@ -129,7 +156,17 @@ def main():
             print(f"Wikipedia summary: {data['wikipedia']}")
             print(f"iNaturalist data: {data['inaturalist']}")
             print(f"Images: {data['images']}")
-            print(f"Audio available: {'Yes' if data['audio'] else 'No'}")
+            print(f"Audio recordings:")
+            for audio in data['audio']:
+                print(f"  - Source: {audio['source']}")
+                print(f"    ID: {audio['id']}")
+                print(f"    URL: {audio['url']}")
+                print(f"    Recordist: {audio['recordist']}")
+                if audio['source'] == 'Xeno-canto':
+                    print(f"    Country: {audio['country']}")
+                    print(f"    Quality: {audio['quality']}")
+                elif audio['source'] == 'Macaulay Library':
+                    print(f"    Details URL: {audio['details_url']}")
 
 if __name__ == "__main__":
     main()
