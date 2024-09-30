@@ -33,14 +33,6 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
 .species-container {
   width: 80%;
   margin: auto;
@@ -98,6 +90,20 @@
 .species-card-right h2 {
   color: #333;
   margin-bottom: 10px;
+}
+
+.narration-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.narration-btn:hover {
+  background-color: #0056b3;
 }
 
 input[type="text"] {

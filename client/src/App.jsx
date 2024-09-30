@@ -8,6 +8,7 @@ const App = () => {
   const [audio, setAudio] = useState(null);
   const [location, setLocation] = useState(""); // No default location
   const [dataFetched, setDataFetched] = useState(false); // Track if data has been fetched
+  const [narrating, setNarrating] = useState({}); // Track narration state for each species
 
   // Fetch species data when the location is provided and submit button is clicked
   const fetchSpecies = async () => {
@@ -33,6 +34,7 @@ const App = () => {
       } else {
         setSpeciesData(data.species_data);
         setDataFetched(true); // Mark data as fetched
+        setNarrating({}); // Reset narration state
       }
     } catch (error) {
       console.error('Error fetching species data:', error);
@@ -56,6 +58,31 @@ const App = () => {
       audio.pause();
       setAudio(null);
     }
+  };
+
+  // Strip markdown syntax from text (so it narrates plain text)
+  const stripMarkdown = (markdown) => {
+    return markdown
+      .replace(/[#*_>\[\]]+/g, '') // Remove markdown symbols like #, *, _ and links
+      .replace(/\(.*?\)/g, ''); // Remove URLs or parenthesis content
+  };
+
+  // Narrate markdown text
+  const narrateText = (species, text) => {
+    const speech = new SpeechSynthesisUtterance(stripMarkdown(text));
+    
+    speech.onend = () => {
+      setNarrating((prev) => ({ ...prev, [species]: false }));
+    };
+
+    window.speechSynthesis.speak(speech);
+    setNarrating((prev) => ({ ...prev, [species]: true }));
+  };
+
+  // Stop the narration
+  const stopNarration = (species) => {
+    window.speechSynthesis.cancel();
+    setNarrating((prev) => ({ ...prev, [species]: false }));
   };
 
   return (
@@ -98,6 +125,16 @@ const App = () => {
             <p><strong>Observations Count:</strong> {data.inaturalist.observations_count}</p>
             <p><strong>Conservation Status:</strong> {data.inaturalist.conservation_status}</p>
             <ReactMarkdown>{data.wikipedia}</ReactMarkdown>
+
+            {/* Play/Pause button for narration */}
+            <button 
+              className="narration-btn"
+              onClick={() => narrating[species] 
+                ? stopNarration(species) 
+                : narrateText(species, data.wikipedia)}
+            >
+              {narrating[species] ? 'Pause' : 'Play'} Narration
+            </button>
           </div>
         </div>
       ))}

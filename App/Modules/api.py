@@ -1,4 +1,5 @@
-import requests
+import aiohttp
+import asyncio
 from bs4 import BeautifulSoup
 import re
 from functools import lru_cache
@@ -23,77 +24,78 @@ def geocode(address: str, length: int = 50) -> tuple:
     
     return None
 
-@lru_cache(maxsize=128)
-def fetch_species_data(species):
-    data = {
-        "wikipedia": "No Wikipedia summary found",
-        "inaturalist": "No iNaturalist data found",
-        "audio": []
-    }
-
-    # Fetch Wikipedia summary
+async def fetch_wikipedia(session, species):
     wiki_url = f"https://en.wikipedia.org/wiki/{species.replace(' ', '_')}"
     try:
-        wiki_response = requests.get(wiki_url)
-        wiki_response.raise_for_status()
-        soup = BeautifulSoup(wiki_response.content, 'html.parser')
-        paragraphs = soup.find_all('p')
-        for p in paragraphs:
-            if p.find('b'):
-                summary = re.sub(r'\[\d+\]', '', p.text)
-                sentences = summary.split('. ')[:3]
-                data["wikipedia"] = '. '.join(sentences) + '.'
-                break
-    except requests.RequestException as e:
+        async with session.get(wiki_url) as wiki_response:
+            if wiki_response.status == 200:
+                soup = BeautifulSoup(await wiki_response.text(), 'html.parser')
+                paragraphs = soup.find_all('p')
+                for p in paragraphs:
+                    if p.find('b'):
+                        summary = re.sub(r'\[\d+\]', '', p.text)
+                        sentences = summary.split('. ')[:3]
+                        return '. '.join(sentences) + '.'
+    except Exception as e:
         print(f"Error fetching Wikipedia data: {e}")
+    return "No Wikipedia summary found"
 
-    # Fetch iNaturalist data
+async def fetch_inaturalist(session, species):
     inaturalist_url = f"https://api.inaturalist.org/v1/taxa?q={species}"
     try:
-        inat_response = requests.get(inaturalist_url)
-        inat_response.raise_for_status()
-        inat_data = inat_response.json()
-        if inat_data['results']:
-            result = inat_data['results'][0]
-            data["inaturalist"] = {
-                'name': result.get('preferred_common_name', species),
-                'scientific_name': result.get('name', 'N/A'),
-                'observations_count': result.get('observations_count', 'N/A'),
-                'conservation_status': result.get('conservation_status', {}).get('status', 'N/A'),
-                'wikipedia_url': result.get('wikipedia_url', 'N/A')
-            }
-    except requests.RequestException as e:
+        async with session.get(inaturalist_url) as inat_response:
+            if inat_response.status == 200:
+                inat_data = await inat_response.json()
+                if inat_data['results']:
+                    result = inat_data['results'][0]
+                    return {
+                        'name': result.get('preferred_common_name', species),
+                        'scientific_name': result.get('name', 'N/A'),
+                        'observations_count': result.get('observations_count', 'N/A'),
+                        'conservation_status': result.get('conservation_status', {}).get('status', 'N/A'),
+                        'wikipedia_url': result.get('wikipedia_url', 'N/A')
+                    }
+    except Exception as e:
         print(f"Error fetching iNaturalist data: {e}")
+    return "No iNaturalist data found"
 
-    # Fetch audio from Xeno-canto (for birds)
+async def fetch_audio(session, species):
     xeno_canto_url = f"https://www.xeno-canto.org/api/2/recordings?query={species}"
+    audio_list = []
     try:
-        xc_response = requests.get(xeno_canto_url)
-        xc_response.raise_for_status()
-        xc_data = xc_response.json()
-        recordings = xc_data.get('recordings', [])
-        for recording in recordings[:2]:  # Limit to 2 recordings
-            audio_data = {
-                'source': 'Xeno-canto',
-                'id': recording.get('id'),
-                'url': recording.get('file'),
-                'recordist': recording.get('rec'),
-                'country': recording.get('cnt'),
-                'quality': recording.get('q')
-            }
-            data["audio"].append(audio_data)
-    except requests.RequestException as e:
+        async with session.get(xeno_canto_url) as xc_response:
+            if xc_response.status == 200:
+                xc_data = await xc_response.json()
+                recordings = xc_data.get('recordings', [])
+                for recording in recordings[:2]:  # Limit to 2 recordings
+                    audio_data = {
+                        'source': 'Xeno-canto',
+                        'id': recording.get('id'),
+                        'url': recording.get('file'),
+                        'recordist': recording.get('rec'),
+                        'country': recording.get('cnt'),
+                        'quality': recording.get('q')
+                    }
+                    audio_list.append(audio_data)
+    except Exception as e:
         print(f"Error fetching Xeno-canto data: {e}")
+    return audio_list
 
-    return data
+async def fetch_species_data(session, species):
+    tasks = [
+        fetch_wikipedia(session, species),
+        fetch_inaturalist(session, species),
+        fetch_audio(session, species)
+    ]
+    wikipedia_summary, inaturalist_data, audio_data = await asyncio.gather(*tasks)
 
-def API_Response(address: str, n: int = 8) -> dict:
-    geo_data = geocode(address)
-    if not geo_data:
-        return {"error": "Address not documented"}
+    return {
+        "wikipedia": wikipedia_summary,
+        "inaturalist": inaturalist_data,
+        "audio": audio_data
+    }
 
-    (min_lat, max_lat, min_lon, max_lon), map_plots = geo_data
-
+async def fetch_gbif_data(min_lat, max_lat, min_lon, max_lon, n=8):
     gbif_url = "https://api.gbif.org/v1/occurrence/search"
     params = {
         'decimalLatitude': f'{min_lat},{max_lat}',
@@ -104,40 +106,50 @@ def API_Response(address: str, n: int = 8) -> dict:
         'mediaType': 'StillImage'
     }
 
-    try:
-        response = requests.get(gbif_url, params=params)
-        response.raise_for_status()
-        results = response.json()
-    except requests.RequestException as e:
-        return {"error": f"Error fetching GBIF data: {e}"}
-
-    excluded_groups = {
-        'Fungi', 'Bacteria', 'Protista', 'Insecta', 'Arachnida', 'Mollusca', 
-        'Annelida', 'Nematoda', 'Platyhelminthes', 'Plankton', 'Cestoda', 
-        'Trematoda', 'Gastropoda', 'Bivalvia'
-    }
-
-    species_data = {}
-
-    for result in results.get('results', []):
-        taxon_class = result.get('class')
-        if 'species' in result and taxon_class not in excluded_groups:
-            species_name = result['species']
-            media = result.get('media', [])
-            media_urls = [m['identifier'] for m in media if 'identifier' in m]
-
-            if media_urls and species_name not in species_data:
-                additional_data = fetch_species_data(species_name)
-                species_data[species_name] = {
-                    "images": media_urls,
-                    "wikipedia": additional_data["wikipedia"],
-                    "inaturalist": additional_data["inaturalist"],
-                    "audio": additional_data["audio"]
+    async with aiohttp.ClientSession() as session:
+        async with session.get(gbif_url, params=params) as response:
+            if response.status == 200:
+                results = await response.json()
+                excluded_groups = {
+                    'Fungi', 'Bacteria', 'Protista', 'Insecta', 'Arachnida', 
+                    'Mollusca', 'Annelida', 'Nematoda', 'Platyhelminthes', 
+                    'Plankton', 'Cestoda', 'Trematoda', 'Gastropoda', 'Bivalvia'
                 }
 
-            if len(species_data) == n:
-                break
+                species_data = {}
+                tasks = []
+                for result in results.get('results', []):
+                    taxon_class = result.get('class')
+                    if 'species' in result and taxon_class not in excluded_groups:
+                        species_name = result['species']
+                        media = result.get('media', [])
+                        media_urls = [m['identifier'] for m in media if 'identifier' in m]
 
+                        if media_urls and species_name not in species_data:
+                            tasks.append(fetch_species_data(session, species_name))
+
+                            species_data[species_name] = {
+                                "images": media_urls,
+                            }
+
+                        if len(species_data) == n:
+                            break
+                
+                if tasks:
+                    additional_data = await asyncio.gather(*tasks)
+                    for species_name, data in zip(species_data.keys(), additional_data):
+                        species_data[species_name].update(data)
+
+                return species_data
+
+async def API_Response(address: str, n: int = 8) -> dict:
+    geo_data = geocode(address)
+    if not geo_data:
+        return {"error": "Address not documented"}
+
+    (min_lat, max_lat, min_lon, max_lon), map_plots = geo_data
+
+    species_data = await fetch_gbif_data(min_lat, max_lat, min_lon, max_lon, n)
     return {
         "species_data": species_data,
         "coords": map_plots
@@ -145,7 +157,8 @@ def API_Response(address: str, n: int = 8) -> dict:
 
 def main():
     address = input("Enter the address: ")
-    result = API_Response(address)
+    loop = asyncio.get_event_loop()
+    result = loop.run_until_complete(API_Response(address))
     
     if "error" in result:
         print(result["error"])
@@ -165,8 +178,6 @@ def main():
                 if audio['source'] == 'Xeno-canto':
                     print(f"    Country: {audio['country']}")
                     print(f"    Quality: {audio['quality']}")
-                elif audio['source'] == 'Macaulay Library':
-                    print(f"    Details URL: {audio['details_url']}")
 
 if __name__ == "__main__":
     main()
