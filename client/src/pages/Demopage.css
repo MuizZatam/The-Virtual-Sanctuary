@@ -1,0 +1,93 @@
+
+.species-container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .species-card {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 30px;
+    background-color: #f9f9f9; /* Light background */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .species-card-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .image-container {
+    position: relative; /* Set relative for the speaker icon positioning */
+    width: 100%;
+  }
+  
+  .species-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 1; /* Ensure 1:1 aspect ratio */
+    border-radius: 10px;
+  }
+  
+  .speaker-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 24px; /* Adjust the size of the emoji */
+    background-color: rgba(255, 255, 255, 0.7); /* Light background behind emoji */
+    border-radius: 50%;
+    padding: 5px;
+    pointer-events: none; /* Ensure the icon doesn't block hover events */
+  }
+  
+  .species-card-right {
+    flex: 2;
+    padding: 20px;
+    color: #333; /* Dark text */
+  }
+  
+  .species-card-right h2 {
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .narration-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  
+  .narration-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  input[type="text"] {
+    padding: 10px;
+    width: 300px;
+    margin: 20px 0;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  

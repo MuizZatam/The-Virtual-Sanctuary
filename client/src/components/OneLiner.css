@@ -1,0 +1,7 @@
+.one-liner {
+    background: #324EB1;
+    background: linear-gradient(to right, #324EB1 0%, #39DF1E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  
+  }
