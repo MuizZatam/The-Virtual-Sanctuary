@@ -1,10 +1,37 @@
 :root {
   --primary-blue: #324EB1;
+  --dark-blue: #19285c;
   --secondary-green: #39DF1E;
+  --dark-green: #1e5017;
   --white: #fff;
+  --black: #000;
+
 }
 
+.skeleton-animation {
+  background: linear-gradient(90deg, 
+    var(--primary-blue) 20%, 
+    var(--dark-blue) 40%, 
+    var(--black) 50%, 
+    var(--dark-green) 60%, 
+    var(--primary-green) 80%, 
+    var(--white) 100%
+  );
+  background-size: 200% 100%; /* Ensures smooth animation */
+  animation: loading 1.5s infinite;
+  width: 100%; /* Set the width as per your design */
+  height: 100px; /* Adjust the height based on the skeleton's placeholder */
+  border-radius: 8px; /* Optional: Rounds the corners */
+}
 
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 .species-container {
     width: 80%;
     margin: auto;

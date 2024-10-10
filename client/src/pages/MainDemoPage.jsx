@@ -110,7 +110,7 @@ const MainDemoPage = () => {
         </div>
       </div>
       {loading && (
-        <Skeleton customHighlightBackground="linear-gradient(90deg, var(--primary-blue) 40%, var(--secondary-green) 50%, var(--white) 60%)" />
+        <Skeleton customHighlightBackground="linear-gradient(90deg, var(--primary-blue) 0%, var(--secondary-green) 50%, var(--white) 90%)" height={5}/>
       )}{" "}
       {/* Show loading indicator */}
       {/* Render species cards only after data is fetched */}
@@ -161,7 +161,7 @@ const MainDemoPage = () => {
               
               {/* Play/Pause button for narration */}
               <button
-                className="narration-btn text-base p-2 font-semibold rounded-xl shadow-xl hover:bg-slate-700"
+                className="narration-btn text-base p-2 font-medium rounded-xl shadow-xl hover:bg-slate-700"
                 onClick={() =>
                   narrating[species]
                     ? stopNarration(species)
