@@ -1,3 +1,10 @@
+:root {
+  --primary-blue: #324EB1;
+  --secondary-green: #39DF1E;
+  --white: #fff;
+}
+
+
 .species-container {
     width: 80%;
     margin: auto;
@@ -46,46 +53,58 @@
     pointer-events: none; /* Ensure the icon doesn't block hover events */
   }
   
+  
   .species-card-right {
     flex: 2;
-    padding: 20px;
+    /* padding: 20px; */
     color: #333; /* Dark text */
   }
   
-  .species-card-right h2 {
-    color: #333;
-    margin-bottom: 10px;
+  .species-card-right p {
+    font-weight: 500;
+    font-size: medium;
+    text-align: justify;
   }
   
   .narration-btn {
-    background-color: #007bff;
+    background-color: #000000;
     color: white;
-    padding: 10px 20px;
+    /* padding: 10px 20px; */
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 15px;
   }
   
-  .narration-btn:hover {
-    background-color: #0056b3;
-  }
-  
+ 
   input[type="text"] {
     padding: 10px;
     width: 300px;
-    margin: 20px 0;
+    margin: 70px 0;
   }
-  
-  button {
-    padding: 10px 20px;
-    background-color: #007bff;
+  .species-container {
+    justify-content: center;
+  }
+  .searchbar {
+    display: flex;
     color: white;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
   }
+  .searchbar img {
+    display: flex ;
+    height: 20px;
+    width: 20px;
+    color: white;
+  }
   
-  button:hover {
-    background-color: #0056b3;
+  .species-container :hover {
+    cursor: pointer;
+  }
+
+
+  /*added css*/
+  .species-container > input {
+    border-radius: 2.5%;
+    font-size: medium;
   }

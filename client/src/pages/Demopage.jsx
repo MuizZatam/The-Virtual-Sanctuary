@@ -5,7 +5,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 function Demopage() {
   return (
     <div className=''>
-      <Skeleton  highlightColor="#435"/>
+      <Skeleton  highlightColor="#ffffff"/>
     </div>
   )
 }

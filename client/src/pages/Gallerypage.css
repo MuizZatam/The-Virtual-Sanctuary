@@ -1,3 +1,5 @@
+
+
 /* Gradient and bg*/
 
 .gradient {
@@ -9,7 +11,8 @@
 }
 
 body {
-  background-image: url('../assets/bg.svg');
+  font-family: Inter;
+  /* background-image: url('../assets/bg.svg'); */
 }
 
 
@@ -88,4 +91,8 @@ body {
 .gallery-item:hover .download-button {
   display: inline-block;
   background-color: white; /* Show the icon only when hovering over the gallery item */
+}
+
+image-container :hover {
+
 }
