@@ -159,8 +159,8 @@ const MainDemoPage = () => {
               </p>
               <ReactMarkdown className="text-gray-700">{data.wikipedia}</ReactMarkdown>
               
-              {/* Play/Pause button for narration */}
-              <button
+              {/* Play/Pause button for narration (REMOVED for newer version) */}
+              {/* <button
                 className="narration-btn text-base p-2 font-medium rounded-xl shadow-xl hover:bg-slate-700"
                 onClick={() =>
                   narrating[species]
@@ -169,7 +169,7 @@ const MainDemoPage = () => {
                 }
               >
                 {narrating[species] ? "Pause" : "Play"} Narration
-              </button>
+              </button> */}
             </div>
           </div>
         ))}
