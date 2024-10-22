@@ -48,12 +48,12 @@ function GalleryPage() {
             </span>{" "}
             in through Stunning Images
           </div>
-          <div className="block text-lg">
+          <div className=" text-lg">
             <input
               className="inputSearch   min-h-10 p-2 m-2 mt-7 rounded-md text-gray-700"
               onKeyDown={onKeyDownHandler}
               placeholder="Search for Anything..."
-              onChange={(e) => setQuery(e.target.value)}
+              onSubmit={(e) => setQuery(e.target.value)}
               value={query}
             ></input>
           </div>
