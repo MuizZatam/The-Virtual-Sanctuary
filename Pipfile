@@ -20,6 +20,7 @@ wikipedia-api = "*"
 flask-cors = "*"
 pandas = "*"
 wikipedia = "*"
+flask-reuploaded = "*"
 
 [dev-packages]
 
